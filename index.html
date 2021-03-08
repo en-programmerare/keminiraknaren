@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Keminiräknaren</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <style>
+            @media screen and (max-width: 1310px) {
+                .flik_knapp {
+                    width: 131px;
+                }
+                .startval {
+                    width: 50vw;
+                }
+                input[type=number] {
+                    width: 50vw;
+                }
+                input[type=text] {
+                    width: 50vw;
+                }
+            }
+            @media screen and (min-width: 1310px) {
+                .flik_knapp {
+                    width: 10%;
+                }
+                .startval {
+                    width: 15vw;
+                }
+                input[type=number] {
+                    width: 20vw;
+                }
+                input[type=text] {
+                    width: 20vw;
+                }
+            }
+            .flikar {
+                background-color: lightgray;
+                height: 7vh;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                white-space: nowrap;
+                
+                overflow-x: scroll;
+            }
+            .flik_knapp {
+                height: 100%;
+                border-style: none;
+            }
+            .aktiv {
+                background-color: white;
+            }
+            .behallare {
+                position: fixed;
+                top: 9vh;
+            }
+            .dold {
+                display: none;
+            }
+            input[type=number] {
+                height: 4vh;
+            }
+            input[type=text] {
+                height: 4vh;
+            }
+            input[type=checkbox] {
+                width: 20px;
+                height: 20px;
+            }
+            select {
+                height: 5vh;
+            }
+            .sidfot {
+                position: absolute;
+                font-size: 7px;
+                bottom: 5px;
+            }
+            .startval {
+                height: 7vh;
+            }
+            #hmeh {
+                display: none;
+                position: fixed;
+                z-index: 0;
+                animation: flyg 10s infinite linear;
+                top: 25vh;
+            }
+            @keyframes flyg {
+                0% {
+                    left: 100vw;
+                    transform: rotateZ(-170deg);
+                }
+                100% {
+                    left: -50vw;
+                    transform: rotateZ(190deg);
+                }
+            }
+            .snedstil {
+                font-style: italic;
+            }
+            .container {
+                display: none;
+                position: fixed;
+                right: 0;
+                top: 0;
+            }
+
+/* Then style the iframe to fit in the container div with full height and width */
+            .responsive-iframe {
+                margin: 0;
+                border: 0;
+                padding: 0;
+                width: 50vw;
+                height: 100vh;
+            }
+            #ogiltlig_begaran {
+                position: fixed;
+                left: 55vw;
+                top: 2vh;
+                z-index: -1;
+            }
+        </style>
+    </head>
+    <body onresize="test()">
+        <div class="flikar">
+            <button type="button" onclick="oppna_flik('substansmangd')" id="flik_substansmangd" class="flik_knapp" onload="flik_substansmangd()">Substansmängd</button>
+            <button type="button" onclick="oppna_flik('massa')" id="flik_massa" class="flik_knapp">Massa</button>
+            <button type="button" onclick="oppna_flik('molmassa')" id="flik_molmassa" class="flik_knapp">Molmassa</button>
+            <button type="button" onclick="oppna_flik('spadning')" id="flik_spadning" class="flik_knapp">Spädning</button>
+            <button type="button" onclick="oppna_flik('koncentration')" id="flik_koncentration" class="flik_knapp">Jonkoncentration</button>
+            <button type="button" onclick="oppna_flik('ph')" id="flik_ph" class="flik_knapp">pH</button>
+            <button type="button" onclick="oppna_flik('ka')" id="flik_ka" class="flik_knapp">Syrakonstanten</button>
+            <button type="button" onclick="oppna_flik('installningar')" id="flik_installningar" class="flik_knapp">Inställningar</button>
+        </div>
+        
+        
+        <div id="substansmangd_behallare" class="behallare dold">
+            Beräkna substansmängd utifrån ämne<br>
+            <input type="text" id="amne_substansmangd" placeholder="Ämne..." oninput="berakna_substansmangd()"><br>
+            <input type="number" id="massa_substansmangd" placeholder="Massa..." oninput="berakna_substansmangd()"> 
+            <select id="massval_substansmangd" onchange="berakna_substansmangd()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select>
+            <br>
+            <output id="substansmangd" ondblclick="hmeh()">0</output> mol<br><br>
+            
+            Beräkna substansmängd utifrån molmassa<br>
+            <input type="number" id="molmassa_substansmangd_molmassa" placeholder="Molmassa..." oninput="berakna_substansmangd_molmassa()"> mol<br>
+            <input type="number" id="massa_substansmangd_molmassa" placeholder="Massa..." oninput="berakna_substansmangd_molmassa()"> 
+            <select id="massval_substansmangd_molmassa" onchange="berakna_substansmangd_molmassa()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select>
+            <br>
+            <output id="substansmangd_molmassa">0</output> mol<br><br>
+            
+            Beräkna substansmängd med allmänna gaslagen<br>
+            <input type="number" id="tryck_substansmangd_gaslag" placeholder="Tryck..." oninput="berakna_substansmangd_gaslag()">
+            <select id="tryckval_substansmangd_gaslag" onchange="berakna_substansmangd_gaslag()">
+                <option selected>kPa</option>
+                <option>hPa</option>
+                <option>Pa</option>
+            </select><br>
+            <input type="number" id="volym_substansmangd_gaslag" placeholder="Volym..." oninput="berakna_substansmangd_gaslag()">
+            <select id="volymval_substansmangd_gaslag" onchange="berakna_substansmangd_gaslag()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            <input type="number" id="temperatur_substansmangd_gaslag" placeholder="Temperatur..." oninput="berakna_substansmangd_gaslag()">
+            <select id="temperaturval_substansmangd_gaslag" onchange="berakna_substansmangd_gaslag()">
+                <option>º C</option>
+                <option>K</option>
+            </select><br>
+            <output id="substansmangd_gaslag">0</output> mol
+        </div>
+        
+        
+        <div id="massa_behallare" class="behallare dold">
+            Beräkna massa utifrån ämne<br>
+            <input type="text" id="amne_massa" placeholder="Ämne..." oninput="berakna_massa()"><br>
+            <input type="number" id="substansmangd_massa" placeholder="Substansmängd..." oninput="berakna_massa()"> mol<br>
+            <output id="massa">0</output> 
+            <select id="utdataval_massa" onchange="berakna_massa()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select><br><br>
+            
+            
+            Beräkna massa utifrån molmassa<br>
+            <input type="number" id="molmassa_massa_molmassa" placeholder="Molmassa..." oninput="berakna_massa_molmassa()"><br>
+            <input type="number" id="substansmangd_massa_molmassa" placeholder="Substansmängd..." oninput="berakna_massa_molmassa()"><br>
+            <output id="massa_molmassa">0</output> 
+            <select id="utdataval_massa_molmassa" onchange="berakna_massa_molmassa()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select>
+        </div>
+        
+        
+        <div id="molmassa_behallare" class="behallare dold">
+            Beräkna molmassa utifrån ämne<br>
+            <input type="text" id="amne_molmassa" placeholder="Ämne..."  oninput="berakna_molmassa()"><br>
+            <output id="molmassa">0</output> g/mol<br><br><br>
+            
+            Beräkna molmassa utifrån mätresultat<br>
+            <input type="number" id="massa_molmassa_matning" placeholder="Massa..."  oninput="berakna_molmassa_matning()"> 
+            <select id="massval_molmassa_matning" onchange="berakna_molmassa_matning()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select><br>
+            <input type="number" id="substansmangd_molmassa_matning" placeholder="Substansmängd..."  oninput="berakna_molmassa_matning()"> mol<br>
+            <output id="molmassa_matning">0</output> g/mol<br>
+        </div>
+        
+        
+        <div id="koncentration_behallare" class="behallare dold">
+            Beräkna oxoniumjonkoncentration utifrån pH<br>
+            pH <input type="number" id="ph_koncentration_oxonium1" placeholder="pH..."  oninput="berakna_koncentration_oxonium1()"><br>
+            <output id="oxoniumjon_koncentration_oxonium1">0</output> mol/dm<sup>3</sup>
+            
+            <br><br>
+            Beräkna hydroxidjonkoncentration utifrån pH<br>
+            pH <input type="number" id="ph_koncentration_hydroxidjon" placeholder="pH..."  oninput="berakna_koncentration_hydroxid()"><br>
+            K<sub>w</sub> = <input type="number" id="kw_koncentration_hydroxidjon" class="kw" placeholder="Vattnets autoprotolyskonstant Kᵥᵥ..." value=1E-14 oninput="berakna_koncentration_hydroxid()"> (mol/dm<sup>3</sup>)<sup>2</sup><br>
+            <output id="hydroxidjon_koncentration_hydroxid">0</output> mol/dm<sup>3</sup>
+            <br><br>
+            
+            Beräkna oxoniumjonkoncentration utifrån syrakonstant för svaga, enprotoniga syror<br>
+            <input type="number" id="koncentration_koncentration_ka" placeholder="Koncentration av syra..."  oninput="berakna_koncentration_ka()"> mol/dm<sup>3</sup><br>
+            <input type="number" id="ka_koncentration_ka" placeholder="Syrakonstant Kₐ..." oninput="berakna_koncentration_ka()"> mol/dm<sup>3</sup><br>
+            <output id="koncentration_ka">0</output> mol/dm<sup>3</sup>
+            <br>
+        </div>
+        
+        <div id="ph_behallare" class="behallare dold">
+            Beräkna pH utifrån oxoniumjonkoncentration<br>
+            <input type="number" id="oxoniumjon_ph_oxoniumjon" placeholder="Oxoniumjonkoncentration..."  oninput="berakna_ph_oxoniumjon()"> mol/dm<sup>3</sup>
+            <br>
+            pH <output id="ph_oxoniumjon">7</output><br><br>
+            Beräkna pH utifrån hydroxidjonkoncentration<br>
+            <input type="number" id="hydroxidjon_ph_hydroxidjon" placeholder="Hydroxidjonkoncentration..."  oninput="berakna_ph_hydroxidjon()"> mol/dm<sup>3</sup><br>
+            K<sub>w</sub> = <input type="number" id="kw_ph_hydroxidjon" class="kw" placeholder="Vattnets autoprotolyskonstant Kᵥᵥ..." value=1E-14 oninput="berakna_ph_hydroxidjon()"> (mol/dm<sup>3</sup>)<sup>2</sup>
+            <br>
+            pH <output id="ph_hydroxidjon">7</output><br><br>
+            Beräkna pH utifrån syrakonstant för svaga, enprotoniga syror<br>
+            <input type="number" id="koncentration_ph_ka" placeholder="Koncentration av syra..."  oninput="berakna_ph_ka()"> mol/dm<sup>3</sup><br>
+            <input type="number" id="ka_ph_ka" placeholder="Syrakonstant Kₐ..." oninput="berakna_ph_ka()"> mol/dm<sup>3</sup>
+            <br>
+            pH <output id="ph_ka">7</output><br><br>
+        </div>
+        
+        <div id="spadning_behallare" class="behallare dold">
+            Beräkna koncentration utifrån substansmängd<br>
+            <input type="number" id="substansmangd_spadning_substansmangd" placeholder="Substansmängd..." oninput="berakna_spadning_substansmangd()"> mol<br>
+            <input type="number" id="volym_spadning_substansmangd" placeholder="Volym..." oninput="berakna_spadning_substansmangd()">
+            <select id="volymval_spadning_substansmangd" onchange="berakna_spadning_substansmangd()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            <output id="spadning_substansmangd">0</output> mol/dm<sup>3</sup><br><br>
+            
+            Beräkna den volym som krävs för att späda ett ämne till en viss koncentration<br>
+            c<sub>konc</sub> = <input type="number" id="ursprungskoncentration_spadning" placeholder="Ursprunglig koncentration..." oninput="berakna_spadning()"> mol/dm<sup>3</sup><br>
+            V<sub>utsp</sub> = <input type="number" id="onskad_volym_spadning" placeholder="Önskad volym..." oninput="berakna_spadning()">
+            <select id="volymval_spadning" onchange="berakna_spadning()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            c<sub>utsp</sub> = <input type="number" id="onskad_koncentration_spadning" placeholder="Önskad koncentration..." oninput="berakna_spadning()"> mol/dm<sup>3</sup><br>
+            V<sub>konc</sub> = <output id="volym_spadning">0</output> 
+            <select id="utdataval_spadning" onchange="berakna_spadning()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select>
+        </div>
+        
+        <div id="ka_behallare" class="behallare dold">
+            Beräkna syrakonstanten K<sub>a</sub> utifrån oxoniumjonkoncentration för svaga, enprotoniga syror<br><br>
+            Beräkna syrakonstanten K<sub>a</sub> utifrån hydroxidjonkoncentration för svaga, enprotoniga syror<br><br>
+            Beräkna syrakonstanten K<sub>a</sub> utifrån pH för svaga, enprotoniga syror<br><br>
+            Beräkna syrakonstanten K<sub>a</sub> utifrån ämne
+        </div>
+        
+        
+        <div id="ogiltlig_behallare" class="behallare dold">
+            Ogiltlig flik.
+        </div>
+        
+        <div id="start_behallare" class="behallare">
+            Välkommen till Keminiräknaren!<br><br>
+            Vad vill du räkna ut?<br>
+            <button type="button" onclick="oppna_flik('substansmangd')" class="startval">Substansmängd</button><br>
+            <button type="button" onclick="oppna_flik('massa')" class="startval">Massa</button><br>
+            <button type="button" onclick="oppna_flik('molmassa')" class="startval">Molmassa</button><br>
+            <button type="button" onclick="oppna_flik('spadning')" class="startval">Spädning</button><br>
+            <button type="button" onclick="oppna_flik('koncentration')" class="startval">Jonkoncentration</button><br>
+            <button type="button" onclick="oppna_flik('ph')" class="startval">pH</button><br>
+            <button type="button" onclick="oppna_flik('ka')" class="startval">Syrakonstanten</button><br>
+            
+            Observera att flyttalshanteringen kan medföra precisionsfel!<br><br>
+            För att skriva i grundpotensform skriver du "E?" i stället för "10<sup>?</sup>".<br>1·10<sup>-14</sup> blir alltså 1E-14<br><br>
+            <br><output id="nyheter" class="snedstil">...</output>
+        </div>
+        
+        
+        <div id="installningar_behallare" class="behallare dold">
+            <label for="standard_kw">Standardvärde för vattnets autoprotolyskonstant K<sub>w</sub>:</label> <input id="standard_kw" type="number" value=1E-14 disabled class="kw" onchange="andraInstallningar()"><br>
+            <label for="decimaler">Antal decimaler vid avrundning:</label> <input id="decimaler" type="number" value=14 disabled onchange="andraInstallningar()"><br>
+            <button type=button onclick="tvadelad()">Använd tvådelad skärm</button><br><br>
+            <p class="snedstil" id="kakor">Vissa inställningar kräver kakor (cookies) för att fungera eftersom de annars inte kan sparas mellan sessioner. Ingenting förutom dessa inställningar lagras, och kakorna försvinner efter 30 dagar. Du kan använda alla andra funktioner på Keminiräknaren utan att aktivera kakor.<br><button type="button" onclick="tillatKakor()">Aktivera cookies</button></p>
+            
+            <button id="radera_kakor" style="display: none;" onclick="tomKakburken()">Radera kakor</button>
+        </div>
+        
+        <div id="storlek">Test. Här testar jag</div>
+        <button type="button" id="flik_start" style="display:none;" class="flik_knapp">Varför syns den här knappen ???</button>
+        <noscript style="position: relative; top: 30vh;">Javascript är inaktiverat. Slå på det för att använda keminiräknaren.</noscript>
+        <div class="sidfot">Jag tar inget ansvar för felaktiga beräkningar av tjänsten. Använd på egen risk!</div>
+        <img src="https://cdn.discordapp.com/attachments/804625214708383775/810814654652612658/logotyp_1.png" id="hmeh" ondblclick="hmeh2()">
+        
+        <div class="container">
+            <output id="ogiltlig_begaran">Ogiltlig begäran.</output>
+            <iframe class="responsive-iframe" src="file:///home/chronos/u-4ecf79cf321ab3a912e219a06d9f0fe4d0e33e18/MyFiles/Downloads/Keminir%C3%A4knaren/index.html"></iframe>
+        </div>
+        
+        <script src="file:///home/chronos/u-4ecf79cf321ab3a912e219a06d9f0fe4d0e33e18/MyFiles/Downloads/Keminir%C3%A4knaren/skript.js"></script>
+    </body>
+</html>
