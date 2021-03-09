@@ -433,6 +433,7 @@ function tillatKakor() {
     try {
         bakaKaka("standardkw", "1E-14", 30);
         bakaKaka("decimaler", 14, 30);
+        alert(ataKaka("decimaler"));
         window.location.reload();
     } catch (exc) {
         alert(exc.message);
@@ -464,36 +465,37 @@ function hmeh2() {
     document.getElementsByTagName("body")[0].style.color = "white";
 }
 
+//Skapa en cookie med namn och värde och som går ut efter ett visst antal dagar
 function bakaKaka(namn, varde, utgang) {
     let utgangsdatum = new Date();
+    //Utgångsdatum anges i millisekunder fr.o.m. nu
     utgangsdatum.setTime(utgangsdatum.getTime() + utgang * 60 * 60 * 24 * 1000);
     let utgangstext = "expires=" + utgangsdatum.toUTCString();
-    document.cookie = namn + "=" + varde + ";" + utgangstext + ";path=/";
+    document.cookie = namn + "=" + varde + ";" + utgangstext + ";path=/"; //Sätt ihop kakan
 }
 
+//Hämta värdet på en kaka
 function ataKaka(namn) {
-    let namn2 = namn + "=";
-    let avkodad = decodeURIComponent(document.cookie);
-    let ca = avkodad.split(";");
-    for(let i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while(c.charAt(0) == " ") {
-            c = c.substring(1);
-        }
-        if(c.indexOf(namn2) == 0) {
-            return c.substring(namn2.length, c.length);
+    namn = namn + "=";
+    let kakortext = decodeURIComponent(document.cookie);
+    let kakor = kakortext.split(";"); //Läs varje text mellan semikolonen
+    for(let kaka of kakor) {
+        if(kaka.includes(namn)) {
+            return kaka.substring(kaka.indexOf(namn) + namn.length); //Om det blir namn=iuhsduyfdygf ska den läsa från och med =
         }
     }
-    return "";
+    return ""; //Om inget hittas, ge tomt svar
 }
 
+//Radera alla cookies
 function tomKakburken() {
     document.cookie.split(';').forEach(function(c) {
-        document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+        document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC;'; //Säg att alla kakor redan är utgångna
     });
     window.location.reload();
 }
 
+//Kolla om en cookie finns
 function kollaKakburken(namn) {
     if(ataKaka(namn) != "")
         return true;
