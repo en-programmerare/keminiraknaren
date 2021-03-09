@@ -42,7 +42,8 @@ nyhetsladdning.send();
 
 //--------------------------
 //TESTKOD
-//alert(ataKaka("standardkw"));
+alert(ataKaka("standardkw"));
+alert(kollaKakburken("standardkw"));
 
 
 function test() {
@@ -419,6 +420,7 @@ function konverteraTemperaturenheter(inenhet, utenhet, varde) {
 
 function kontrolleraKakorVidStart() {
     if(kollaKakburken("standardkw")) {
+        alert("Cookies finns");
         let kwfalt = document.getElementsByClassName("kw");
         for(let falt of kwfalt) {
             falt.value = ataKaka("standardkw");
@@ -497,7 +499,7 @@ function tomKakburken() {
 
 //Kolla om en cookie finns
 function kollaKakburken(namn) {
-    if(ataKaka(namn) !== "")
-        return true;
-    return false;
+    if(ataKaka(namn) === "")
+        return false;
+    return true;
 }
