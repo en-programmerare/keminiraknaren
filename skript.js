@@ -40,6 +40,8 @@ nyhetsladdning.onreadystatechange = function() {
 nyhetsladdning.open("GET", "https://raw.githubusercontent.com/en-programmerare/persiljahjalp-filer/master/nyheter-keminiraknaren", true);
 nyhetsladdning.send();
 
+kontrolleraKakorVidStart();
+
 //--------------------------
 //TESTKOD
 alert(ataKaka("standardkw"));
@@ -420,12 +422,13 @@ function konverteraTemperaturenheter(inenhet, utenhet, varde) {
 
 function kontrolleraKakorVidStart() {
     if(kollaKakburken("standardkw")) {
+        document.getElementById("kakor").style.display = "none";
+        document.getElementById("radera_kakor").style.display = "inline";
         alert("Cookies finns");
         let kwfalt = document.getElementsByClassName("kw");
         for(let falt of kwfalt) {
             falt.value = ataKaka("standardkw");
             falt.disabled = false;
-            document.getElementById("kakor").style.display = "none";
         }
         avrunda = Number(ataKaka("decimaler"));
     }
