@@ -497,7 +497,7 @@ function tomKakburken() {
 
 //Kolla om en cookie finns
 function kollaKakburken(namn) {
-    if(ataKaka(namn) != "")
+    if(ataKaka(namn) !== "")
         return true;
     return false;
 }
