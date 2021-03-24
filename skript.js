@@ -682,10 +682,9 @@ function ataKaka(namn) {
 
 //Radera alla cookies
 function tomKakburken() {
-    document.cookie.split(";").forEach(function(kaka) {
-        //Gör det genom att sätta alla kakors utgångstid till 1970
-        document.cookie = kaka + "=;expires=" + new Date(0).toUTCString() + ";";
-    });
+    let allakakor = document.cookie.split(';');
+    for(var i = 0; i < allCookies.length; i++)
+        document.cookie = allakakor[i] + "=;expires=" + new Date(0).toUTCString();
     window.location.reload();
 }
 
