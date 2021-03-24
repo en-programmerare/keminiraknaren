@@ -35,54 +35,63 @@
             }
             .flikar {
                 background-color: lightgray;
-                height: 7vh;
+                width: 100vw;
                 position: fixed;
                 top: 0;
                 left: 0;
-                width: 100vw;
+                height: 50px;
                 white-space: nowrap;
-                
-                overflow-x: scroll;
+                overflow-x: hidden;
+                z-index: 10;
             }
             .flik_knapp {
-                height: 100%;
                 border-style: none;
+                height: 100%;
+            }
+            .flik_meny_knapp {
+                position: static;
+                border-style: none;
+                width: 100%;
+                height: 50px;
             }
             .aktiv {
                 background-color: white;
             }
             .behallare {
                 position: fixed;
-                top: 9vh;
+                top: 60px;
+                width: 100vw;
+                overflow-y: scroll;
+                height: 80vh;
             }
             .dold {
                 display: none;
             }
             input[type=number] {
-                height: 4vh;
+                height: 27px;
             }
             input[type=text] {
-                height: 4vh;
+                height: 27px;
             }
             input[type=checkbox] {
                 width: 20px;
                 height: 20px;
             }
             select {
-                height: 5vh;
+                height: 34px;
             }
             .sidfot {
                 position: absolute;
                 font-size: 7px;
                 bottom: 5px;
             }
-            .startval {
-                height: 7vh;
+            button {
+                height: 45px;
             }
             #hmeh {
                 display: none;
                 position: fixed;
-                z-index: 0;
+                z-index: 4;
                 animation: flyg 10s infinite linear;
                 top: 25vh;
             }
@@ -120,10 +129,35 @@
                 top: 2vh;
                 z-index: -1;
             }
+            .meny_knapp {
+                position: absolute;
+                right: 0;
+                width: 50px;
+                height: 100%;
+            }
+            #meny {
+                position: fixed;
+                top: 50px;
+                right: 0;
+                background-color: lightgrey;
+                width: 131px;
+                z-index: 2;
+                display: none;
+                overflow-y: auto;
+            }
+            .fet {
+                font-weight: bold;
+            }
+            
         </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </head>
+    <div id="meny">
+    </div>
     <body onresize="test()">
         <div class="flikar">
+            <button type="button" class="meny_knapp" onclick="oppnaStangMeny(false)" id="meny_knapp"><i class="fa fa-bars"></i></button>
             <button type="button" onclick="oppna_flik('substansmangd')" id="flik_substansmangd" class="flik_knapp" onload="flik_substansmangd()">Substansmängd</button>
             <button type="button" onclick="oppna_flik('massa')" id="flik_massa" class="flik_knapp">Massa</button>
             <button type="button" onclick="oppna_flik('molmassa')" id="flik_molmassa" class="flik_knapp">Molmassa</button>
@@ -131,6 +165,11 @@
             <button type="button" onclick="oppna_flik('koncentration')" id="flik_koncentration" class="flik_knapp">Jonkoncentration</button>
             <button type="button" onclick="oppna_flik('ph')" id="flik_ph" class="flik_knapp">pH</button>
             <button type="button" onclick="oppna_flik('ka')" id="flik_ka" class="flik_knapp">Syrakonstanten</button>
+            <button type="button" onclick="oppna_flik('energi')" id="flik_energi" class="flik_knapp">Energi</button>
+            <!--<button type="button" onclick="oppna_flik('temperatur')" id="flik_temperatur" class="flik_knapp">Temperatur</button>-->
+            <!--<button type="button" onclick="oppna_flik('volym')" id="flik_volym" class="flik_knapp">Volym</button>-->
+            <button type="button" onclick="oppna_flik('tryck')" id="flik_tryck" class="flik_knapp">Tryck</button>
+            <!--<button type="button" onclick="oppna_flik('formelsamling')" id="flik_formelsamling" class="flik_knapp">Formelsamling</button>-->
             <button type="button" onclick="oppna_flik('installningar')" id="flik_installningar" class="flik_knapp">Inställningar</button>
         </div>
         
@@ -210,14 +249,48 @@
                 <option>hg</option>
                 <option selected>g</option>
                 <option>mg</option>
-            </select>
+            </select><br><br>
+            
+            Beräkna massa med allmänna gaslagen<br>
+            <input type="text" id="amne_massa_gaslag" placeholder="Ämne..." oninput="berakna_massa_gaslag()"><br>
+            <input type="number" id="tryck_massa_gaslag" placeholder="Tryck..." oninput="berakna_massa_gaslag()">
+            <select id="tryckval_massa_gaslag" onchange="berakna_massa_gaslag()">
+                <option selected>kPa</option>
+                <option>hPa</option>
+                <option>Pa</option>
+            </select><br>
+            <input type="number" id="volym_massa_gaslag" placeholder="Volym..." oninput="berakna_massa_gaslag()">
+            <select id="volymval_massa_gaslag" onchange="berakna_massa_gaslag()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            <input type="number" id="temperatur_massa_gaslag" placeholder="Temperatur..." oninput="berakna_massa_gaslag()">
+            <select id="temperaturval_massa_gaslag" onchange="berakna_massa_gaslag()">
+                <option>º C</option>
+                <option>K</option>
+            </select><br>
+            <output id="massa_gaslag">0</output> 
+            <select id="utdataval_massa_gaslag" onchange="berakna_massa_gaslag()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select><br><br>
+            
         </div>
         
         
         <div id="molmassa_behallare" class="behallare dold">
             Beräkna molmassa utifrån ämne<br>
             <input type="text" id="amne_molmassa" placeholder="Ämne..."  oninput="berakna_molmassa()"><br>
-            <output id="molmassa">0</output> g/mol<br><br><br>
+            <output id="molmassa">0</output> g/mol<br><br>
             
             Beräkna molmassa utifrån mätresultat<br>
             <input type="number" id="massa_molmassa_matning" placeholder="Massa..."  oninput="berakna_molmassa_matning()"> 
@@ -240,15 +313,20 @@
             <br><br>
             Beräkna hydroxidjonkoncentration utifrån pH<br>
             pH <input type="number" id="ph_koncentration_hydroxidjon" placeholder="pH..."  oninput="berakna_koncentration_hydroxid()"><br>
-            K<sub>w</sub> = <input type="number" id="kw_koncentration_hydroxidjon" class="kw" placeholder="Vattnets autoprotolyskonstant Kᵥᵥ..." value=1E-14 oninput="berakna_koncentration_hydroxid()"> (mol/dm<sup>3</sup>)<sup>2</sup><br>
+            K<sub>w</sub> = <input type="number" id="kw_koncentration_hydroxidjon" class="kw" placeholder="Vattnets protolyskonstant Kᵥᵥ..." value=1E-14 oninput="berakna_koncentration_hydroxid()"> (mol/dm<sup>3</sup>)<sup>2</sup><br>
             <output id="hydroxidjon_koncentration_hydroxid">0</output> mol/dm<sup>3</sup>
             <br><br>
             
             Beräkna oxoniumjonkoncentration utifrån syrakonstant för svaga, enprotoniga syror<br>
-            <input type="number" id="koncentration_koncentration_ka" placeholder="Koncentration av syra..."  oninput="berakna_koncentration_ka()"> mol/dm<sup>3</sup><br>
+            <input type="number" id="koncentration_koncentration_ka" placeholder="Syrakoncentration före protolys..."  oninput="berakna_koncentration_ka()"> mol/dm<sup>3</sup><br>
             <input type="number" id="ka_koncentration_ka" placeholder="Syrakonstant Kₐ..." oninput="berakna_koncentration_ka()"> mol/dm<sup>3</sup><br>
             <output id="koncentration_ka">0</output> mol/dm<sup>3</sup>
-            <br>
+            <br><br>
+            Beräkna oxoniumjonkoncentration utifrån hydroxidjonkoncentration och vice versa<br>
+            <input type="number" id="jonkoncentration_viceversa" placeholder="Oxonium- eller hydroxidjonkoncentration"  oninput="berakna_viceversa()"> mol/dm<sup>3</sup><br>
+            K<sub>w</sub> = <input type="number" id="kw_viceversa" class="kw" placeholder="Vattnets protolyskonstant Kᵥᵥ..." value=1E-14 oninput="berakna_viceversa()"> (mol/dm<sup>3</sup>)<sup>2</sup><br>
+            <output id="viceversa">0</output> mol/dm<sup>3</sup>
+            <br><br>
         </div>
         
         <div id="ph_behallare" class="behallare dold">
@@ -258,11 +336,11 @@
             pH <output id="ph_oxoniumjon">7</output><br><br>
             Beräkna pH utifrån hydroxidjonkoncentration<br>
             <input type="number" id="hydroxidjon_ph_hydroxidjon" placeholder="Hydroxidjonkoncentration..."  oninput="berakna_ph_hydroxidjon()"> mol/dm<sup>3</sup><br>
-            K<sub>w</sub> = <input type="number" id="kw_ph_hydroxidjon" class="kw" placeholder="Vattnets autoprotolyskonstant Kᵥᵥ..." value=1E-14 oninput="berakna_ph_hydroxidjon()"> (mol/dm<sup>3</sup>)<sup>2</sup>
+            K<sub>w</sub> = <input type="number" id="kw_ph_hydroxidjon" class="kw" placeholder="Vattnets protolyskonstant Kᵥᵥ..." value=1E-14 oninput="berakna_ph_hydroxidjon()"> (mol/dm<sup>3</sup>)<sup>2</sup>
             <br>
             pH <output id="ph_hydroxidjon">7</output><br><br>
             Beräkna pH utifrån syrakonstant för svaga, enprotoniga syror<br>
-            <input type="number" id="koncentration_ph_ka" placeholder="Koncentration av syra..."  oninput="berakna_ph_ka()"> mol/dm<sup>3</sup><br>
+            <input type="number" id="koncentration_ph_ka" placeholder="Syrakoncentration före protolys..."  oninput="berakna_ph_ka()"> mol/dm<sup>3</sup><br>
             <input type="number" id="ka_ph_ka" placeholder="Syrakonstant Kₐ..." oninput="berakna_ph_ka()"> mol/dm<sup>3</sup>
             <br>
             pH <output id="ph_ka">7</output><br><br>
@@ -311,14 +389,195 @@
                 <option>dl</option>
                 <option>cl</option>
                 <option>ml</option>
-            </select>
+            </select><br><br>
+            
+            Beräkna koncentration efter blandning<br>
+            <input type="number" id="koncentration1_blandning_spadning" placeholder="Koncentration..." oninput="berakna_blandning_spadning()"> mol/dm<sup>3</sup><br>
+            <input type="number" id="volym1_blandning_spadning" placeholder="Volym..." oninput="berakna_blandning_spadning()"> 
+            <select id="volymval1_blandning_spadning" onchange="berakna_blandning_spadning()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            <input type="number" id="koncentration2_blandning_spadning" placeholder="Koncentration..." oninput="berakna_blandning_spadning()"> mol/dm<sup>3</sup><br>
+            <input type="number" id="volym2_blandning_spadning" placeholder="Volym..." oninput="berakna_blandning_spadning()"> 
+            <select id="volymval2_blandning_spadning" onchange="berakna_blandning_spadning()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            <output id="blandning_spadning">0</output> mol/dm<sup>3</sup>
         </div>
         
         <div id="ka_behallare" class="behallare dold">
-            Beräkna syrakonstanten K<sub>a</sub> utifrån oxoniumjonkoncentration för svaga, enprotoniga syror<br><br>
-            Beräkna syrakonstanten K<sub>a</sub> utifrån hydroxidjonkoncentration för svaga, enprotoniga syror<br><br>
-            Beräkna syrakonstanten K<sub>a</sub> utifrån pH för svaga, enprotoniga syror<br><br>
-            Beräkna syrakonstanten K<sub>a</sub> utifrån ämne
+            Beräkna syrakonstanten K<sub>a</sub> utifrån oxoniumjonkoncentration för svaga, enprotoniga syror<br>
+            <input type="number" id="oxoniumjon_ka_oxoniumjon" placeholder="Oxoniumjonkoncentration..." oninput="berakna_ka_oxoniumjon()"> mol/dm<sup>3</sup><br>
+            <input type="number" id="syra_ka_oxoniumjon" placeholder="Syrakoncentration före protolys..." oninput="berakna_ka_oxoniumjon()"> mol/dm<sup>3</sup><br>
+            <output id="ka_oxoniumjon">0</output> mol/dm<sup>3</sup><br><br>
+         
+            
+            Beräkna syrakonstanten K<sub>a</sub> utifrån pH för svaga, enprotoniga syror<br>
+            pH <input type="number" id="ph_ka_ph" placeholder="pH..." oninput="berakna_ka_ph()"><br>
+            <input type="number" id="syra_ka_ph" placeholder="Syrakoncentration före protolys..." oninput="berakna_ka_ph()"> mol/dm<sup>3</sup><br>
+            <output id="ka_ph">0</output> mol/dm<sup>3</sup><br><br>
+        </div>
+        <div id="temperatur_behallare" class="behallare dold">
+            Beräkna temperatur med allmänna gaslagen<br><br>
+            Beräkna temperaturförändring utifrån energi och specifik värmekapacitet
+        </div>
+        <div id="energi_behallare" class="behallare dold">
+            Beräkna energi utifrån temperaturförändring och specifik värmekapacitet<br>
+            <input type="number" id="c_energi_c" placeholder="Specifik värmekapacitet..." oninput="berakna_energi_c()">
+            <select id="energival_c_energi_c" onchange="berakna_energi_c()">
+                <option>kJ</option>
+                <option>J</option>
+                <option>kcal</option>
+                <option>cal</option>
+            </select>/(
+            <select id="massval_c_energi_c" onchange="berakna_energi_c()">
+                <option selected>kg</option>
+                <option>hg</option>
+                <option>g</option>
+                <option>mg</option>
+            </select>&middot;
+            <select id="temperaturval_energi_c" onchange="berakna_energi_c()">
+                <option>º C</option>
+                <option selected>K</option>
+            </select>)<br>
+            <input type="number" placeholder="Massa..." oninput="berakna_energi_c()" id="massa_energi_c"> 
+            <select id="massval_energi_c" onchange="berakna_energi_c()">
+                <option selected>kg</option>
+                <option>hg</option>
+                <option>g</option>
+                <option>mg</option>
+            </select>
+            <br>
+            <input type="number" placeholder="Temperaturförändring..." oninput="berakna_energi_c()" id="temperatur_energi_c"> 
+            <select onchange="berakna_energi_c()">
+                <option>º C</option>
+                <option>K</option>
+            </select>
+            <br>
+            <output id="energi_c">0</output> 
+            <select id="utdataval_energi_c" onchange="berakna_energi_c()">
+                <option>kJ</option>
+                <option>J</option>
+                <option>kcal</option>
+                <option>cal</option>
+            </select>
+            <br><br>
+            
+            Beräkna energi utifrån temperaturskillnad och ämne<br>
+            Ämne:
+            <select id="amne_energi_amne">
+                <option>Vatten</option>
+                <option>Guld</option>
+                <option>Koppar</option>
+                <option>Järn</option>
+                <option>Kol (i diamant)</option>
+                <option>Kol (i grafit)</option>
+                <option>Aluminium</option>
+                <option>Etanol</option>
+            </select><br>
+            <input type="number" placeholder="Massa..." oninput="berakna_energi_amne()" id="massa_energi_amne"> 
+            <select id="massval_energi_amne" onchange="berakna_energi_amne()">
+                <option selected>kg</option>
+                <option>hg</option>
+                <option>g</option>
+                <option>mg</option>
+            </select>
+            <br>
+            <input type="number" placeholder="Temperaturförändring..." oninput="berakna_energi_amne()" id="temperatur_energi_amne"> 
+            <select onchange="berakna_energi_amne()">
+                <option>º C</option>
+                <option>K</option>
+            </select>
+            <br>
+            <output id="energi_amne">0</output> 
+            <select id="utdataval_energi_amne" onchange="berakna_energi_amne()">
+                <option>kJ</option>
+                <option>J</option>
+                <option>kcal</option>
+                <option>cal</option>
+            </select>
+        </div>
+        <div id="tryck_behallare" class="behallare dold">
+            Beräkna tryck med allmänna gaslagen utifrån massa<br>
+            <input type="text" id="amne_tryck_gaslag1" placeholder="Ämne..." oninput="berakna_tryck_gaslag1()"><br>
+            <input type="number" id="massa_tryck_gaslag1" placeholder="Massa..." oninput="berakna_tryck_gaslag1()"> 
+            <select id="massval_tryck_gaslag1" onchange="berakna_tryck_gaslag1()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select>
+            <br>
+            <input type="number" id="volym_tryck_gaslag1" placeholder="Volym..." oninput="berakna_tryck_gaslag1()">
+            <select id="volymval_tryck_gaslag1" onchange="berakna_tryck_gaslag1()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            <input type="number" id="temperatur_tryck_gaslag1" placeholder="Temperatur..." oninput="berakna_tryck_gaslag1()">
+            <select id="temperaturval_tryck_gaslag1" onchange="berakna_tryck_gaslag1()">
+                <option>º C</option>
+                <option>K</option>
+            </select><br>
+            <output id="tryck_gaslag1">0</output> 
+            <select id="utdataval_tryck_gaslag1" onchange="berakna_tryck_gaslag1()">
+                <option selected>kPa</option>
+                <option>hPa</option>
+                <option>Pa</option>
+            </select><br><br>
+            
+            Beräkna tryck med allmänna gaslagen utifrån substansmängd<br>
+            <input type="number" id="substansmangd_tryck_gaslag" placeholder="Substansmängd..." oninput="berakna_tryck_gaslag()"> mol
+            <br>
+            <input type="number" id="volym_tryck_gaslag" placeholder="Volym..." oninput="berakna_tryck_gaslag()">
+            <select id="volymval_tryck_gaslag" onchange="berakna_tryck_gaslag()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br>
+            <input type="number" id="temperatur_tryck_gaslag" placeholder="Temperatur..." oninput="berakna_tryck_gaslag()">
+            <select id="temperaturval_tryck_gaslag" onchange="berakna_tryck_gaslag()">
+                <option>º C</option>
+                <option>K</option>
+            </select><br>
+            <output id="tryck_gaslag">0</output> 
+            <select id="utdataval_tryck_gaslag" onchange="berakna_tryck_gaslag()">
+                <option selected>kPa</option>
+                <option>hPa</option>
+                <option>Pa</option>
+            </select>
+            
+        </div>
+        <div id="volym_behallare" class="behallare dold">
+            Beräkna volym med allmänna gaslagen
         </div>
         
         
@@ -329,30 +588,99 @@
         <div id="start_behallare" class="behallare">
             Välkommen till Keminiräknaren!<br><br>
             Vad vill du räkna ut?<br>
-            <button type="button" onclick="oppna_flik('substansmangd')" class="startval">Substansmängd</button><br>
-            <button type="button" onclick="oppna_flik('massa')" class="startval">Massa</button><br>
+            <button type="button" onclick="oppna_flik('substansmangd')" class="startval">Substansmängd</button>
+            <button type="button" onclick="oppna_flik('massa')" class="startval">Massa</button>
             <button type="button" onclick="oppna_flik('molmassa')" class="startval">Molmassa</button><br>
-            <button type="button" onclick="oppna_flik('spadning')" class="startval">Spädning</button><br>
-            <button type="button" onclick="oppna_flik('koncentration')" class="startval">Jonkoncentration</button><br>
+            <button type="button" onclick="oppna_flik('spadning')" class="startval">Spädning</button>
+            <button type="button" onclick="oppna_flik('koncentration')" class="startval">Jonkoncentration</button>
             <button type="button" onclick="oppna_flik('ph')" class="startval">pH</button><br>
-            <button type="button" onclick="oppna_flik('ka')" class="startval">Syrakonstanten</button><br>
+            <button type="button" onclick="oppna_flik('ka')" class="startval">Syrakonstanten</button>
+            <button type="button" onclick="oppna_flik('energi')" class="startval">Energi</button>
+            <button type="button" onclick="oppna_flik('tryck')" class="startval">Tryck</button><br>
             
             Observera att flyttalshanteringen kan medföra precisionsfel!<br><br>
-            För att skriva i grundpotensform skriver du "E?" i stället för "10<sup>?</sup>".<br>1·10<sup>-14</sup> blir alltså 1E-14<br><br>
-            <br><output id="nyheter" class="snedstil">...</output>
+            För att skriva i grundpotensform skriver du "E?" i stället för "10<sup>?</sup>".<br>1·10<sup>-14</sup> blir alltså 1E-14
+        </div>
+        
+        <div id="formelsamling_behallare" class="behallare dold">
+            Följande förkortningar och enheter används på sidan om inget annat anges:<br>
+            \(m = \) massa (g)<br>
+            \(M = \) molmassa (g/mol)<br>
+            \(n = \) substansmängd (mol)<br>
+            \(c = \) koncentration (mol/dm<sup>3</sup>)<br>
+            \(V = \) volym (dm<sup>3</sup>)<br>
+            \(T = \) temperatur (&deg; C)<br>
+            \(p = \) tryck (Pa)<br>
+            \(C = \) specifik värmekapacitet (kJ/(kg&middot;K))<br>
+            \(q = \) energi (kJ)<br>
+            <br>
+            <details>
+                <summary >Massa</summary>
+                \(m = n \cdot M\)<br>
+                För gaser gäller att \(m = M \cdot \dfrac{pV}{8,314 \cdot T}\) där \(V\) anges i m<sup>3</sup>.
+            </details>
+            <details>
+                <summary>Molmassa</summary>
+                \(M = \dfrac{m}{n}\)<br>
+            </details>
+            <details>
+                <summary>Substansmängd</summary>
+                \(n = \dfrac{m}{M}\)<br>
+                \(n = c \cdot V\)<br>
+                För gaser gäller att \(n = \dfrac{pV}{8,314 \cdot T}\) där \(V\) anges i m<sup>3</sup>.
+            </details>
+            <details>
+                <summary>Koncentration och spädning</summary>
+                \(c = \dfrac{n}{V}\)<br>
+                Om du blandar två lösningar av samma ämne, men med olika koncentration gäller att:<br>
+                \(c = \dfrac{c_1 \cdot V_1 + c_2 \cdot V_2}{V_1 + V_2}\)<br>
+                Om du vill tillreda en lösning med en viss koncentration och ska beräkna hur mycket av en mer koncentrerad lösning som ska användas gäller att:<br>
+                \(V_{konc} = \dfrac{V_{utsp} \cdot c_{utsp}}{c_{konc}}\)
+            </details>
+            <details>
+                <summary>Hydroxid- och oxoniumjonkoncentration</summary>
+                \([H_3O^+] = 10^{-pH}\)<br>
+                \([OH^-] = 10^{-pOH}\)<br>
+                \([H_3O^+] = \dfrac{K_w}{[OH^-]}\) där \(K_w\) är vattnets protolyskonstant i (mol/dm<sup>3</sup>)<sup>2</sup><br>
+                \([OH^-] = \dfrac{K_w}{[H_3O^+]}\) där \(K_w\) är vattnets protolyskonstant i (mol/dm<sup>3</sup>)<sup>2</sup><br>
+                För svaga, enprotoniga syror gäller att:<br>
+                \([H_3O^+] \approx \sqrt{K_a \cdot [H\!A]_{urspr}}\) där \([H\!A]_{urspr}\) är den ursprungliga koncentrationen av syra före protolys i mol/dm<sup>3</sup> och \(K_a\) är syrakonstanten i mol/dm<sup>3</sup>. <br><br>
+                För svaga enprotoniga syror gäller att:<br>
+                \([H_3O^+] = \dfrac{K_a}{2} + \sqrt{\dfrac{K_a}{2} + [H\!A]_{urspr} \cdot K_a}\) där \([H\!A]_{urspr}\) är den ursprungliga koncentrationen av syra före protolys i mol/dm<sup>3</sup> och \(K_a\) är syrakonstanten i mol/dm<sup>3</sup>.<br>
+                
+            </details>
+            <details>
+                <summary>pH och pOH</summary>
+                \(pH = -\lg{[H_3O^+]}\)<br>
+                \(pOH = -\lg{[OH^-]}\)<br>
+                \(pH = -\lg{\left(\dfrac{K_w}{[OH^-]}\right)}\) där \(K_w\) är vattnets protolyskonstanst i (mol/dm<sup>3</sup>)<sup>2</sup>.<br>
+                \(pOH = -\lg{\left(\dfrac{K_w}{[H_3O^+]}\right)}\) där \(K_w\) är vattnets protolyskonstanst i (mol/dm<sup>3</sup>)<sup>2</sup>.<br><br>
+                För svaga, enprotoniga syror gäller att:<br>
+                \(pH \approx -\lg{\left(\sqrt{K_a \cdot [H\!A]_{urspr}}\right)}\) där \([H\!A]_{urspr}\) är den ursprungliga koncentrationen av syra före protolys i mol/dm<sup>3</sup> och \(K_a\) är syrakonstanten i mol/dm<sup>3</sup>.<br><br>
+                För svaga enprotoniga syror gäller att:<br>
+                \(pH = -\lg{\left(\dfrac{K_a}{2} + \sqrt{\dfrac{K_a}{2} + [H\!A]_{urspr} \cdot K_a}\right)}\) där \([H\!A]_{urspr}\) är den ursprungliga koncentrationen av syra före protolys i mol/dm<sup>3</sup> och \(K_a\) är syrakonstanten i mol/dm<sup>3</sup>.<br>
+            </details>
+            <details>
+                <summary>Syrakonstanten K<sub>a</sub></summary>
+                \(K_a = \dfrac{[H_3O^+] \cdot [A^-]}{[H\!A]}\) där \([A^-]\) är koncentrationen negativa joner efter protolys i mol/dm<sup>3</sup> och \([H\!A]\) är koncentrationen syramolekyler efter protolys i mol/dm<sup>3</sup>.
+            </details>
+            <details>
+                <summary>Energi</summary>
+                \(q = C \cdot m \cdot \Delta T\) där \(m\) anges i kg
+            </details>
         </div>
         
         
+        
         <div id="installningar_behallare" class="behallare dold">
-            <label for="standard_kw">Standardvärde för vattnets autoprotolyskonstant K<sub>w</sub>:</label> <input id="standard_kw" type="number" value=1E-14 disabled class="kw" onchange="andraInstallningar()"><br>
+            <label for="standard_kw">Standardvärde för vattnets protolyskonstant K<sub>w</sub>:</label> <input id="standard_kw" type="number" value=1E-14 disabled class="kw" onchange="andraInstallningar()"><br>
             <label for="decimaler">Antal decimaler vid avrundning:</label> <input id="decimaler" type="number" value=14 disabled onchange="andraInstallningar()"><br>
-            <button type=button onclick="tvadelad()">Använd tvådelad skärm</button><br><br>
+            <button type=button onclick="tvadelad()" id="tvadelad_knapp">Använd tvådelad skärm</button><br><br>
             <p class="snedstil" id="kakor">Vissa inställningar kräver kakor (cookies) för att fungera eftersom de annars inte kan sparas mellan sessioner. Ingenting förutom dessa inställningar lagras, och kakorna försvinner efter 30 dagar. Du kan använda alla andra funktioner på Keminiräknaren utan att aktivera kakor.<br><button type="button" onclick="tillatKakor()">Aktivera cookies</button></p>
             
             <button id="radera_kakor" style="display: none;" onclick="tomKakburken()">Radera kakor</button>
         </div>
         
-        <div id="storlek">Test. Här testar jag</div>
         <button type="button" id="flik_start" style="display:none;" class="flik_knapp">Varför syns den här knappen ???</button>
         <noscript style="position: relative; top: 30vh;">Javascript är inaktiverat. Slå på det för att använda keminiräknaren.</noscript>
         <div class="sidfot">Jag tar inget ansvar för felaktiga beräkningar av tjänsten. Använd på egen risk!</div>
@@ -360,7 +688,7 @@
         
         <div class="container">
             <output id="ogiltlig_begaran">Ogiltlig begäran.</output>
-            <iframe class="responsive-iframe" src=""></iframe>
+            <iframe class="responsive-iframe" src="https://en-programmerare.github.io/keminiraknaren"></iframe>
         </div>
         
         <script src="skript.js"></script>

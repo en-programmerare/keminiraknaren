@@ -1,6 +1,8 @@
 let decimaler = 14;
 //listor med värden
 const masstal = [59.0, 1.008, 4.0026, 6.94, 9.0122, 10.81, 12.011, 14.007, 15.999, 18.998, 20.180, 22.990, 24.305, 26.982, 28.085, 30.974, 32.06, 35.45, 39.948, 39.098, 40.078, 44.956, 47.867, 50.942, 51.996, 54.938, 55.845, 58.933, 58.693, 63.546, 65.38];
+//Vatten, guld, koppar, järn, kol, kol, aluminium, etanol
+let specifik_varmekapacitet = [4.19, 0.13, 0.39, 0.45, 0.49, 0.69, 0.9, 2.43];
 const tecken = ["Ac", "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn"];
 const namn = ["acetat", "väte", "helium", "litium", "beryllium", "bor", "kol", "kväve", "syre", "fluor", "neon", "natrium", "magnesium", "aluminium", "kisel", "fosfor", "svavel", "klor", "argon", "kalium", "kalcium", "skandium", "titan", "vanadin", "krom", "mangan", "järn", "kobolt", "nickel", "koppar", "zink"];
 const trivialnamn = [
@@ -20,11 +22,15 @@ const trivialnamn = [
     ["lut", "KOH"]
 ];
 const negativ_jonnamn = ["acetat", "hydrid", "-", "-", "-", "-", "-", "nitrid", "oxid", "fluorid", "-", "-", "-", "-", "-", "-", "fosfid", "sulfid", "klorid", "-", "-"];
+//Sparade värden
+
 //för enhetsomvandling
 let massenheter = ["mg", "cg", "dg", "g", "dag", "hg", "kg"];
 let volymenheter1 = ["mm³", "cm³", "dm³", "m³", "dam³", "hm³", "km³"];
 let volymenheter2 = ["ml", "cl", "dl", "l"];
 let tryckenheter = ["Pa", "daPa", "hPa", "kPa"];
+
+let praktiskBreddminskning = 1;
 
 //---------------------
 
@@ -41,16 +47,41 @@ nyhetsladdning.open("GET", "https://raw.githubusercontent.com/en-programmerare/p
 nyhetsladdning.send();
 
 kontrolleraKakorVidStart();
+for(let i of document.getElementsByClassName("flik_knapp")) {
+    let klonad = i.cloneNode(true);
+    klonad.classList.remove("flik_knapp");
+    klonad.classList.add("flik_meny_knapp");
+    klonad.id = klonad.id + "_klonad";
+    document.getElementById("meny").appendChild(klonad);
+    let br = document.createElement("BR");
+    br.classList.add("meny_br");
+    document.getElementById("meny").appendChild(br);
+}
+document.getElementById("flik_start_klonad").style.display = "none";
+test();
 
 //--------------------------
 //TESTKOD
-alert(ataKaka("standardkw"));
-alert(kollaKakburken("standardkw"));
 
+//oppna_flik("formelsamling");
 
 function test() {
-    document.getElementById("storlek")
-        .innerHTML = window.innerWidth;
+    for(let i = 0; i < document.getElementsByClassName("flik_knapp").length; i++) {
+        document.getElementsByClassName("flik_knapp")[i].style.display = "inline";
+        document.getElementsByClassName("flik_meny_knapp")[i].style.display = "none";
+        document.getElementsByClassName("meny_br")[i].style.display = "none";
+    }
+    if(window.innerWidth * praktiskBreddminskning> 1310)
+        i = 9;
+    else
+        i = Math.floor((window.innerWidth * praktiskBreddminskning) / 131);
+    while(i < document.getElementsByClassName("flik_knapp").length) {
+        document.getElementsByClassName("flik_knapp")[i].style.display = "none";
+        document.getElementsByClassName("flik_meny_knapp")[i].style.display = "inline";
+        document.getElementsByClassName("meny_br")[i].style.display = "inline";
+        i++;
+    }
+    document.getElementById("flik_start_klonad").style.display = "none";
 }
 
 //--------------------------
@@ -59,7 +90,12 @@ function test() {
 
 function oppna_flik(flik) {
     //Stäng av alla flikar
+    oppnaStangMeny(true);
     for(let objekt of document.getElementsByClassName("flik_knapp")) {
+        objekt.classList.remove("aktiv");
+    }
+    //Stäng av alla menyknappar
+    for(let objekt of document.getElementsByClassName("flik_meny_knapp")) {
         objekt.classList.remove("aktiv");
     }
     //Dölj alla behållare
@@ -73,11 +109,26 @@ function oppna_flik(flik) {
             .classList.remove("dold");
         document.getElementById("flik_" + flik)
             .classList.add("aktiv");
+        document.getElementById("flik_" + flik + "_klonad")
+            .classList.add("aktiv");
     } catch (exc) {
         //Hantera felaktiga fliknamn i koden
         document.getElementById("ogiltlig_behallare")
             .classList.remove("dold");
-        alert(exc.message);
+    }
+}
+
+//Öppna och stäng meny
+function oppnaStangMeny(stang_endast) {
+    if(stang_endast)
+        document.getElementById("meny_knapp").classList.add("aktiv");
+    if(document.getElementById("meny_knapp").classList.contains("aktiv")) {
+        document.getElementById("meny_knapp").classList.remove("aktiv");
+        document.getElementById("meny").style.display = "none";
+    }
+    else {
+        document.getElementById("meny_knapp").classList.add("aktiv");
+        document.getElementById("meny").style.display = "block";
     }
 }
 
@@ -162,6 +213,20 @@ function berakna_molmassa_matning() {
             .value);
 }
 
+// n = pV / RT  m = n * M
+function berakna_massa_gaslag() {
+    let temperatur = konverteraTemperaturenheter(document.getElementById("temperaturval_massa_gaslag")
+        .value, "K", Number(document.getElementById("temperatur_massa_gaslag")
+            .value));
+    let tryck = konverteraTryckenheter(document.getElementById("tryckval_massa_gaslag")
+        .value, "Pa", Number(document.getElementById("tryck_massa_gaslag")
+            .value));
+    let volym = konverteraVolymenheter(document.getElementById("volymval_massa_gaslag")
+        .value, "m³", Number(document.getElementById("volym_massa_gaslag")
+            .value));
+    let substansmangd = Number(String((tryck * volym) / (8.314 * temperatur)));
+    document.getElementById("massa_gaslag").innerHTML = avrunda(konverteraMassenheter("g", document.getElementById("utdataval_massa_gaslag").value, molmassa(document.getElementById("amne_massa_gaslag").value) * substansmangd));
+}
 // n = m / M
 function berakna_substansmangd_molmassa() {
     let molmassa = document.getElementById("molmassa_substansmangd_molmassa")
@@ -195,7 +260,7 @@ function berakna_ph_ka() {
     let c = document.getElementById("koncentration_ph_ka")
         .value;
     document.getElementById("ph_ka")
-        .innerHTML = avrunda(-Math.log10(-(Ka / 2) + Math.sqrt((Ka / 2) ** 2 + c * Ka)));
+        .innerHTML = avrunda(-Math.log10(-(Ka / 2) + Math.sqrt(Math.pow((Ka / 2), 2) + c * Ka)));
 }
 
 //  ([H3O+]^2) / ([HA] - [H3O+]) = Ka
@@ -205,27 +270,21 @@ function berakna_koncentration_ka() {
     let c = document.getElementById("koncentration_koncentration_ka")
         .value;
     document.getElementById("koncentration_ka")
-        .innerHTML = avrunda(-(Ka / 2) + Math.sqrt((Ka / 2) ** 2 + c * Ka));
+        .innerHTML = avrunda(-(Ka / 2) + Math.sqrt(Math.pow((Ka / 2), 2) + c * Ka));
 
 }
 
 //  [H3O+] = 10^(-pH)
 function berakna_koncentration_oxonium1() {
     document.getElementById("oxoniumjon_koncentration_oxonium1")
-        .innerHTML = avrunda(10 ** (-document.getElementById("ph_koncentration_oxonium1")
-            .value));
+        .innerHTML = avrunda(Math.pow(10, (-document.getElementById("ph_koncentration_oxonium1")
+            .value)));
 }
 
 // [OH-] = kw / ( 10^(-pH) )
 function berakna_koncentration_hydroxid() {
-    try {
-        document.getElementById("hydroxidjon_koncentration_hydroxid")
-            .innerHTML = avrunda(document.getElementById("kw_koncentration_hydroxidjon")
-                .value / 10 ** (-document.getElementById("ph_koncentration_hydroxidjon")
-                    .value));
-    } catch (exc) {
-        alert(exc.message);
-    }
+    document.getElementById("hydroxidjon_koncentration_hydroxid").innerHTML =
+        avrunda(document.getElementById("kw_koncentration_hydroxidjon").value / Math.pow(10, -document.getElementById("ph_koncentration_hydroxidjon").value));
 }
 
 //  c = n / V
@@ -234,8 +293,8 @@ function berakna_spadning_substansmangd() {
             .value, "dm³", document.getElementById("volym_spadning_substansmangd")
             .value)); 
     document.getElementById("spadning_substansmangd")
-        .innerHTML = document.getElementById("substansmangd_spadning_substansmangd")
-        .value / volym;
+        .innerHTML = avrunda(document.getElementById("substansmangd_spadning_substansmangd")
+        .value / volym);
 }
 
 //   Ckonc * Vkonc = Cutsp * Vutsp
@@ -247,9 +306,89 @@ function berakna_spadning() {
             .value) / document.getElementById("ursprungskoncentration_spadning")
         .value;
     document.getElementById("volym_spadning")
-        .innerHTML = konverteraVolymenheter("dm³", document.getElementById("utdataval_spadning")
-            .value, klart);
+        .innerHTML = avrunda(konverteraVolymenheter("dm³", document.getElementById("utdataval_spadning")
+            .value, klart));
 }
+
+// (n1 * v1 + n2 * v2) / (v1 + v2)
+function berakna_blandning_spadning() {
+    let koncentration1 = document.getElementById("koncentration1_blandning_spadning").value;
+    let volym1 = konverteraVolymenheter(document.getElementById("volymval1_blandning_spadning").value, "dm³", document.getElementById("volym1_blandning_spadning").value);
+    let koncentration2 = document.getElementById("koncentration2_blandning_spadning").value;
+    let volym2 = konverteraVolymenheter(document.getElementById("volymval2_blandning_spadning").value, "dm³", document.getElementById("volym2_blandning_spadning").value);
+    let substansmangd = koncentration1 * volym1 + koncentration2 * volym2;
+    let nyvolym = volym1 + volym2;
+    document.getElementById("blandning_spadning").innerHTML = avrunda(substansmangd / nyvolym);
+}
+//   Ka = ([H3O+]*[A-]) / [HA] - [A-]
+function berakna_ka_oxoniumjon() {
+    let oxonium = document.getElementById("oxoniumjon_ka_oxoniumjon").value;
+    let syra = document.getElementById("syra_ka_oxoniumjon").value;
+
+    document.getElementById("ka_oxoniumjon").innerHTML = avrunda(Math.pow(oxonium, 2) / (syra - oxonium));
+}
+
+// Ka = (10^-pH * [A-]) / [HA] - [A-]
+function berakna_ka_ph() {
+    let ph = document.getElementById("ph_ka_ph").value;
+    let syra = document.getElementById("syra_ka_ph").value;
+    
+    document.getElementById("ka_ph").innerHTML = avrunda(Math.pow(Math.pow(10, -1 * ph), 2) / (syra - Math.pow(10, -1 * ph)));
+}
+
+function berakna_viceversa() {
+   document.getElementById("viceversa").innerHTML = avrunda(document.getElementById("kw_viceversa").value / document.getElementById("jonkoncentration_viceversa").value);
+}
+
+function berakna_energi_c() {
+    let specifik = document.getElementById("c_energi_c").value;
+    let specifik_enhet_j = document.getElementById("energival_c_energi_c").value;
+    let specifik_enhet_g = document.getElementById("massval_c_energi_c").value;
+    
+    specifik = specifik / konverteraMassenheter(specifik_enhet_g, "g", 1);
+    specifik = konverteraEnergienheter(specifik_enhet_j, "J", specifik);
+    
+    let massa = konverteraMassenheter(document.getElementById("massval_energi_c").value, "g", document.getElementById("massa_energi_c").value);
+    let deltaT = document.getElementById("temperatur_energi_c").value;
+    
+    document.getElementById("energi_c").innerHTML = avrunda(konverteraEnergienheter("J", document.getElementById("utdataval_energi_c").value, specifik * massa * deltaT));
+    
+}
+
+function berakna_energi_amne() {
+    let specifik = specifik_varmekapacitet[document.getElementById("amne_energi_amne").selectedIndex];
+    
+    specifik = specifik / konverteraMassenheter("kg", "g", 1);
+    specifik = konverteraEnergienheter("kJ", "J", specifik);
+    
+    let massa = konverteraMassenheter(document.getElementById("massval_energi_amne").value, "g", document.getElementById("massa_energi_amne").value);
+    let deltaT = document.getElementById("temperatur_energi_amne").value;
+    
+    document.getElementById("energi_amne").innerHTML = avrunda(konverteraEnergienheter("J", document.getElementById("utdataval_energi_amne").value, specifik * massa * deltaT));
+}
+
+function berakna_tryck_gaslag() {
+    let substans = Number(document.getElementById("substansmangd_tryck_gaslag").value);
+    let volym = konverteraVolymenheter(document.getElementById("volymval_tryck_gaslag").value, "m³", Number(document.getElementById("volym_tryck_gaslag").value));
+    let temperatur = konverteraTemperaturenheter(document.getElementById("temperaturval_tryck_gaslag").value, "K", Number(document.getElementById("temperatur_tryck_gaslag").value));
+    
+    let tryck = konverteraTryckenheter("Pa", document.getElementById("utdataval_tryck_gaslag").value, (substans * temperatur * 8.314) / volym);
+    document.getElementById("tryck_gaslag").innerHTML = avrunda(tryck);
+}
+
+function berakna_tryck_gaslag1() {
+    let massa = konverteraMassenheter(document.getElementById("massval_tryck_gaslag1").value, "g", document.getElementById("massa_tryck_gaslag1").value);
+    let volym = konverteraVolymenheter(document.getElementById("volymval_tryck_gaslag1").value, "m³", document.getElementById("volym_tryck_gaslag1").value);
+    let temperatur = konverteraTemperaturenheter(document.getElementById("temperaturval_tryck_gaslag1").value, "K", Number(document.getElementById("temperatur_tryck_gaslag1").value));
+    
+    let substans = massa * molmassa(document.getElementById("amne_tryck_gaslag1").value);
+    
+    let tryck = konverteraTryckenheter("Pa", document.getElementById("utdataval_tryck_gaslag1").value, (substans * temperatur * 8.314) / volym);
+    document.getElementById("tryck_gaslag1").innerHTML = avrunda(tryck);
+}
+
+
+//function 
 
 
 //----------------
@@ -301,7 +440,7 @@ function molmassa(amne) {
 
         //Om den första bokstaven inte är stor har nåt gått fel
         } else {
-            alert("Fel i formeltolkning");
+            console.log("Fel i formeltolkning");
             index++;
         }
     }
@@ -354,7 +493,7 @@ function tillSummaformel(text) {
 
 //Avrunda ett tal till så många decimaler som står i den globala variabeln
 function avrunda(tal) {
-    return Math.round((tal + Number.EPSILON) * 10 ** decimaler) / 10 ** decimaler;
+    return Math.round((tal + Number.EPSILON) * Math.pow(10, decimaler)) / Math.pow(10, decimaler);
 }
 
 
@@ -367,12 +506,12 @@ function konverteraMassenheter(inenhet, utenhet, varde) {
     //Konvertera till grundenhet
     if(massenheter.includes(inenhet)) {
         //enheterna lagras i en array där varje steg är 10 ggr mindre en det förra
-        g = varde * (10 ** (massenheter.indexOf(inenhet) - 3));
+        g = varde * Math.pow(10, (massenheter.indexOf(inenhet) - 3));
     }
     //Konvertera till utenhet enlig ovan
     let svar = 0;
     if(massenheter.includes(utenhet)) {
-        svar = g * (10 ** (-(massenheter.indexOf(utenhet) - 3)));
+        svar = g * Math.pow(10, (-(massenheter.indexOf(utenhet) - 3)));
     }
     return svar;
 
@@ -382,15 +521,15 @@ function konverteraMassenheter(inenhet, utenhet, varde) {
 function konverteraVolymenheter(inenhet, utenhet, varde) {
     let g = 0;
     if(volymenheter1.includes(inenhet)) {
-        g = varde * (1000 ** (volymenheter1.indexOf(inenhet) - 2));
+        g = varde * Math.pow(1000, (volymenheter1.indexOf(inenhet) - 2));
     } else if(volymenheter2.includes(inenhet)) {
-        g = varde * (10 ** (volymenheter2.indexOf(inenhet) - 3));
+        g = varde * Math.pow(10, (volymenheter2.indexOf(inenhet) - 3));
     }
     let svar = 0;
     if(volymenheter1.includes(utenhet)) {
-        svar = g * (1000 ** (-(volymenheter1.indexOf(utenhet) - 2)));
+        svar = g * Math.pow(1000, (-(volymenheter1.indexOf(utenhet) - 2)));
     } else if(volymenheter2.includes(utenhet)) {
-        svar = g * (10 ** (-(volymenheter2.indexOf(utenhet) - 3)));
+        svar = g * Math.pow(10, (-(volymenheter2.indexOf(utenhet) - 3)));
     }
     return svar;
 }
@@ -398,11 +537,11 @@ function konverteraVolymenheter(inenhet, utenhet, varde) {
 function konverteraTryckenheter(inenhet, utenhet, varde) {
     let g = 0;
     if(tryckenheter.includes(inenhet)) {
-        g = varde * (10 ** (tryckenheter.indexOf(inenhet)));
+        g = varde * Math.pow(10, (tryckenheter.indexOf(inenhet)));
     }
     let svar = 0;
     if(tryckenheter.includes(utenhet)) {
-        svar = g * (10 ** (-(tryckenheter.indexOf(utenhet))));
+        svar = g * Math.pow(10, (-(tryckenheter.indexOf(utenhet))));
     }
     return svar;
 }
@@ -419,12 +558,50 @@ function konverteraTemperaturenheter(inenhet, utenhet, varde) {
     else
         return c;
 }
+function konverteraEnergienheter(inenhet, utenhet, varde) {
+    let J;
+    switch(inenhet) {
+        case "kJ":
+            J = varde * 1000;
+            break;
+        case "J":
+            J = varde;
+            break;
+        case "kcal":
+            J = varde * 4.184 * 1000;
+            break;
+        case "cal":
+            J = varde * 4.184;
+            break;
+        default:
+            J = -1;
+    }
+    switch(utenhet) {
+        case "kJ":
+            J = J / 1000;
+            break;
+        case "J":
+            J = J;
+            break;
+        case "kcal":
+            J = J / (4.184 * 1000);
+            break;
+        case "cal":
+            J = J / 4.184;
+            break;
+        default:
+            J = -1;
+    }
+    return J;
+}
 
 function kontrolleraKakorVidStart() {
     if(kollaKakburken("standardkw")) {
         document.getElementById("kakor").style.display = "none";
         document.getElementById("radera_kakor").style.display = "inline";
-        alert("Cookies finns");
+        document.getElementById("decimaler").disabled = false;
+        document.getElementById("decimaler").value = ataKaka("decimaler");
+        console.log("Cookies finns");
         let kwfalt = document.getElementsByClassName("kw");
         for(let falt of kwfalt) {
             falt.value = ataKaka("standardkw");
@@ -438,7 +615,6 @@ function tillatKakor() {
     try {
         bakaKaka("standardkw", "1E-14", 30);
         bakaKaka("decimaler", 14, 30);
-        alert(ataKaka("decimaler"));
         window.location.reload();
     } catch (exc) {
         alert(exc.message);
@@ -446,20 +622,32 @@ function tillatKakor() {
 }
 function andraInstallningar() {
     bakaKaka("standardkw", document.getElementById("standard_kw").value);
-    bakaKaka("decimaler", document.getElementById("standard_kw").value);
+    bakaKaka("decimaler", document.getElementById("decimaler").value);
 }
 
 function tvadelad() {
-    for(let behallare of document.getElementsByClassName("behallare")) {
-        behallare.style.width = "50vw";
+    if(document.getElementsByClassName("container")[0].style.display !== "block") {
+        for(let behallare of document.getElementsByClassName("behallare")) {
+            behallare.style.width = "50vw";
+        }
+        document.getElementsByClassName("flikar")[0].style.width = "50vw";
+        document.getElementsByClassName("container")[0].style.display = "block";
+        document.getElementById("tvadelad_knapp").innerHTML = "Stäng tvådelad skärm";
+        praktiskBreddminskning = 0.5;
     }
-    for(let flik of document.getElementsByClassName("flik_knapp")) {
-        flik.style.width = "10vw";
+    else {
+        for(let behallare of document.getElementsByClassName("behallare")) {
+            behallare.style.width = "100vw";
+        }
+        document.getElementsByClassName("flikar")[0].style.width = "100vw";
+        document.getElementsByClassName("container")[0].style.display = "none";
+        document.getElementById("tvadelad_knapp").innerHTML = "Använd tvådelad skärm";
+        praktiskBreddminskning = 1;
     }
-    document.getElementsByClassName("flikar")[0].style.width = "50vw";
-    document.getElementsByClassName("container")[0].style.display = "block";
+    test();
 }
 
+//HMEH hmeh HmEH
 function hmeh() {
     document.getElementById("hmeh")
         .style.display = "block";
@@ -494,8 +682,9 @@ function ataKaka(namn) {
 
 //Radera alla cookies
 function tomKakburken() {
-    document.cookie.split(';').forEach(function(c) {
-        document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC;'; //Säg att alla kakor redan är utgångna
+    document.cookie.split(";").forEach(function(kaka) {
+        //Gör det genom att sätta alla kakors utgångstid till 1970
+        document.cookie = kaka + "=;expires=" + new Date(0).toUTCString() + ";";
     });
     window.location.reload();
 }
