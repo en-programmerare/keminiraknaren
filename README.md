@@ -1,2 +1,17 @@
-# keminiraknaren
-Välkommen till keminiräknaren. Det är fortfarande bara ett test, men gå gärna till en-programmerare.github.io/keminiraknaren om du vill pröva.
+# Keminiräknaren
+Välkommen till keminiräknaren. Du hittar den på [https://en-programmerare.github.io/keminiraknaren/](https://en-programmerare.github.io/keminiraknaren/).
+
+## Funktioner som stöds
+* Substansmängd
+* Massa
+* Molmassa
+* Spädning
+* pH
+* Syrakonstanten Kₐ
+* Volym
+* Tryck
+* Normalpotential
+* Emk (elektromotorisk kraft)
+* Energi
+
+_Tänk på att det är **jag** som gjort keminiräknaren och att därför finns en stor risk att det blir fel ibland!_
