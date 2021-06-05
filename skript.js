@@ -1,6 +1,9 @@
 let decimaler = 14;
 //listor med värden
 const masstal = [59.0, 1.008, 4.0026, 6.94, 9.0122, 10.81, 12.011, 14.007, 15.999, 18.998, 20.180, 22.990, 24.305, 26.982, 28.085, 30.974, 32.06, 35.45, 39.948, 39.098, 40.078, 44.956, 47.867, 50.942, 51.996, 54.938, 55.845, 58.933, 58.693, 63.546, 65.38];
+
+const normalpotentialer = [-3.04, -2.92, -2.9, -2.87, -2.71, -2.37, -1.66, -0.83, -0.76, -0.48, -0.44, -0.36, -0.25, -0.14, -0.13, 0, 0.34, 0.40, 0.52, 0.54, 0.77, 0.80, 0.81, 0.85, 0.93, 0.96, 1.07, 1.23, 1.33, 1.36, 1.51, 2.87];
+const element = ["Li⁺ / Li", "K⁺ / K", "Ba²⁺ / Ba", "Ca²⁺ / Ca", "Na⁺ / Na", "Mg²⁺ / Mg", "Al³⁺ / Al", "2 H₂O / 2 OH⁻ + H₂", "Zn²⁺ / Zn", "S / S²⁻", "Fe²⁺ / Fe", "PbSO₄ + H⁺ / Pb + HSO₄⁻", "Ni²⁺ / Ni", "Sn²⁺ / Sn", "Pb²⁺ / Pb", "2 H⁺ / H₂", "Cu²⁺ / Cu", "O₂ + 2 H₂O / 4OH⁻", "Cu⁺ / Cu", "I₂ / 2 I⁻", "Fe³⁺ / Fe²⁺", "Ag⁺ / Ag", "NO₃⁻ + 2 H⁺ / NO₂ + H₂O", "Hg²⁺ / Hg", "HgO + 2 H⁺ / Hg + H₂O", "NO₃⁻ + 4 H⁺ / NO + 2 H₂O", "Br₂ / 2 Br⁻", "O₂ + 4 H⁺ / 2 H₂O", "Cr₂O₇²⁻ + 14 H⁺ / 2 Cr³⁺ + 7 H₂O", "Cl₂ / 2 Cl⁻", "MnO₄⁻ + 8 H⁺ / Mn²⁺ + 4 H₂O", "F₂ / 2 F⁻", "sh"];
 //Vatten, guld, koppar, järn, kol, kol, aluminium, etanol
 let specifik_varmekapacitet = [4.19, 0.13, 0.39, 0.45, 0.49, 0.69, 0.9, 2.43];
 const tecken = ["Ac", "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn"];
@@ -59,6 +62,14 @@ for(let i of document.getElementsByClassName("flik_knapp")) {
 }
 document.getElementById("flik_start_klonad").style.display = "none";
 test();
+for(let halvcell of element) {
+    for(let listor of document.getElementsByClassName("halvcellslista")) {
+        if(halvcell !== "2 H⁺ / H₂")
+            listor.innerHTML += "<option>" + halvcell + "</option>";
+        else
+            listor.innerHTML += "<option selected>" + halvcell + "</option>";
+    }
+}
 
 //--------------------------
 //TESTKOD
@@ -381,14 +392,70 @@ function berakna_tryck_gaslag1() {
     let volym = konverteraVolymenheter(document.getElementById("volymval_tryck_gaslag1").value, "m³", document.getElementById("volym_tryck_gaslag1").value);
     let temperatur = konverteraTemperaturenheter(document.getElementById("temperaturval_tryck_gaslag1").value, "K", Number(document.getElementById("temperatur_tryck_gaslag1").value));
     
-    let substans = massa * molmassa(document.getElementById("amne_tryck_gaslag1").value);
+    let substans = massa / molmassa(document.getElementById("amne_tryck_gaslag1").value);
     
     let tryck = konverteraTryckenheter("Pa", document.getElementById("utdataval_tryck_gaslag1").value, (substans * temperatur * 8.314) / volym);
     document.getElementById("tryck_gaslag1").innerHTML = avrunda(tryck);
 }
+function berakna_volym_gaslag1() {
+    let massa = konverteraMassenheter(document.getElementById("massval_volym_gaslag1").value, "g", document.getElementById("massa_volym_gaslag1").value);
+    
+    let substans = massa / molmassa(document.getElementById("amne_volym_gaslag1").value);
+    let tryck = konverteraTryckenheter(document.getElementById("tryckval_volym_gaslag1").value, "Pa", Number(document.getElementById("tryck_volym_gaslag1").value));
+    let temperatur = konverteraTemperaturenheter(document.getElementById("temperaturval_volym_gaslag1").value, "K", Number(document.getElementById("temperatur_volym_gaslag1").value));
+    
+    let volym = konverteraVolymenheter("m³", document.getElementById("utdataval_volym_gaslag1").value, (substans * 8.314 * temperatur) / tryck);
+    document.getElementById("volym_gaslag1").innerHTML = avrunda(volym);
+}
 
+function berakna_volym_gaslag2() {
+    let substans = Number(document.getElementById("substansmangd_volym_gaslag2").value);
+    let tryck = konverteraTryckenheter(document.getElementById("tryckval_volym_gaslag2").value, "Pa", Number(document.getElementById("tryck_volym_gaslag2").value));
+    let temperatur = konverteraTemperaturenheter(document.getElementById("temperaturval_volym_gaslag2").value, "K", Number(document.getElementById("temperatur_volym_gaslag2").value));
+    
+    let volym = konverteraVolymenheter("m³", document.getElementById("utdataval_volym_gaslag2").value, (substans * 8.314 * temperatur) / tryck);
+    document.getElementById("volym_gaslag2").innerHTML = avrunda(volym);
+}
 
-//function 
+function berakna_normalpotential() {
+    if(element.includes(document.getElementById("halvcell_normalpotential").value))
+        document.getElementById("normalpotential").innerHTML = normalpotentialer[element.indexOf(document.getElementById("halvcell_normalpotential").value)];
+    else
+        document.getElementById("normalpotential").innerHTML = "?";
+}
+
+function berakna_emk_halvceller() {
+    let halvcell1 = document.getElementById("halvcell1_emk").value;
+    let halvcell2 = document.getElementById("halvcell2_emk").value;
+    let eo1; //normalpotentialer
+    let eo2;
+    if(element.includes(halvcell1) && element.includes(halvcell2)) {
+        eo1 = normalpotentialer[element.indexOf(halvcell1)];
+        eo2 = normalpotentialer[element.indexOf(halvcell2)];
+    }
+    else {
+        document.getElementById("emk").innerHTML = "?";
+        return;
+    }
+    
+    if(eo1 > eo2) {
+        document.getElementById("emk").innerHTML = eo1 - eo2;
+    }
+    else {
+        document.getElementById("emk").innerHTML = eo2 - eo1;
+    }
+}
+
+function berakna_emk_normalpotentialer() {
+    let eo1 = Number(document.getElementById("eo1_emk1").value);
+    let eo2 = Number(document.getElementById("eo2_emk1").value);
+    if(eo1 > eo2) {
+        document.getElementById("emk_eo").innerHTML = eo1 - eo2;
+    }
+    else {
+        document.getElementById("emk_eo").innerHTML = eo2 - eo1;
+    }
+}
 
 
 //----------------
@@ -493,7 +560,7 @@ function tillSummaformel(text) {
 
 //Avrunda ett tal till så många decimaler som står i den globala variabeln
 function avrunda(tal) {
-    return Math.round((tal + Number.EPSILON) * Math.pow(10, decimaler)) / Math.pow(10, decimaler);
+    return Math.round((tal) * Math.pow(10, decimaler)) / Math.pow(10, decimaler);
 }
 
 
@@ -596,33 +663,50 @@ function konverteraEnergienheter(inenhet, utenhet, varde) {
 }
 
 function kontrolleraKakorVidStart() {
-    if(kollaKakburken("standardkw")) {
+    if(typeof(Storage) === undefined) {
+        debugmeddelande("Webbläsaren stödjer ej lokal lagring.");
+        document.getElementById("tillat_kakor").style.display = "none";
+        document.getElementById("kakor").innerHTML = "Tyvärr kan dina inställningar inte lagras mellan besök eftersom din webbläsare inte har stöd för lokal lagring.";
+    }
+    else if(kollaKakburken("standardkw")) {
+        debugmeddelande("Lokal lagring påslagen. Läser in."); 
         document.getElementById("kakor").style.display = "none";
         document.getElementById("radera_kakor").style.display = "inline";
-        document.getElementById("decimaler").disabled = false;
-        document.getElementById("decimaler").value = ataKaka("decimaler");
-        console.log("Cookies finns");
+        document.getElementById("decimaler").value = Number(ataKaka("decimaler"));
+        document.getElementById("standard_kw").value = ataKaka("standardkw");
         let kwfalt = document.getElementsByClassName("kw");
         for(let falt of kwfalt) {
             falt.value = ataKaka("standardkw");
-            falt.disabled = false;
         }
-        avrunda = Number(ataKaka("decimaler"));
+        decimaler = Number(ataKaka("decimaler"));
+    }
+    else {
+        debugmeddelande("Lokal lagring ej påslagen.");
     }
 }
 
 function tillatKakor() {
-    try {
-        bakaKaka("standardkw", "1E-14", 30);
-        bakaKaka("decimaler", 14, 30);
-        window.location.reload();
-    } catch (exc) {
-        alert(exc.message);
-    }
+    bakaKaka("standardkw", Number(document.getElementById("standard_kw").value));
+    bakaKaka("decimaler", Number(document.getElementById("decimaler").value));
+    window.location.reload();
 }
 function andraInstallningar() {
-    bakaKaka("standardkw", document.getElementById("standard_kw").value);
-    bakaKaka("decimaler", document.getElementById("decimaler").value);
+    let kwfalt = document.getElementsByClassName("kw");
+    if(typeof(Storage) !== undefined) {
+        if(kollaKakburken("standardkw")) {
+            bakaKaka("standardkw", Number(document.getElementById("standard_kw").value));
+            bakaKaka("decimaler", Number(document.getElementById("decimaler").value));
+        }
+    }
+    decimaler = Number(document.getElementById("decimaler").value);
+    for(let falt of kwfalt) {
+        falt.value = document.getElementById("standard_kw").value;
+        falt.disabled = false;
+    }
+    document.getElementById("bekraftat").style.display = "inline";
+    setTimeout(function() {
+        document.getElementById("bekraftat").style.display = "none";
+    }, 3000);
 }
 
 function tvadelad() {
@@ -647,10 +731,11 @@ function tvadelad() {
     test();
 }
 
-//HMEH hmeh HmEH
+//HMEH
 function hmeh() {
     document.getElementById("hmeh")
         .style.display = "block";
+    debugmeddelande("hmeh");
 }
 
 function hmeh2() {
@@ -658,39 +743,34 @@ function hmeh2() {
     document.getElementsByTagName("body")[0].style.color = "white";
 }
 
-//Skapa en cookie med namn och värde och som går ut efter ett visst antal dagar
-function bakaKaka(namn, varde, utgang) {
-    let utgangsdatum = new Date();
-    //Utgångsdatum anges i millisekunder fr.o.m. nu
-    utgangsdatum.setTime(utgangsdatum.getTime() + utgang * 60 * 60 * 24 * 1000);
-    let utgangstext = "expires=" + utgangsdatum.toUTCString();
-    document.cookie = namn + "=" + varde + ";" + utgangstext + ";path=/"; //Sätt ihop kakan
+//Skapa en local storage med visst namn och värde
+function bakaKaka(namn, varde) {
+    localStorage.setItem(namn, varde);
+    debugmeddelande("Lokal lagring ändrad.<br>" + namn + " - " + varde);
 }
 
 //Hämta värdet på en kaka
 function ataKaka(namn) {
-    namn = namn + "=";
-    let kakortext = decodeURIComponent(document.cookie);
-    let kakor = kakortext.split(";"); //Läs varje text mellan semikolonen
-    for(let kaka of kakor) {
-        if(kaka.includes(namn)) {
-            return kaka.substring(kaka.indexOf(namn) + namn.length); //Om det blir namn=iuhsduyfdygf ska den läsa från och med =
-        }
-    }
-    return ""; //Om inget hittas, ge tomt svar
+    debugmeddelande("Värde från lokal lagring:<br>" + namn + " - " + localStorage.getItem(namn));
+    return localStorage.getItem(namn);
 }
 
 //Radera alla cookies
 function tomKakburken() {
-    let allakakor = document.cookie.split(';');
-    for(var i = 0; i < allCookies.length; i++)
-        document.cookie = allakakor[i] + "=;expires=" + new Date(0).toUTCString();
+    localStorage.removeItem("standardkw");
+    localStorage.removeItem("decimaler");
     window.location.reload();
 }
 
 //Kolla om en cookie finns
 function kollaKakburken(namn) {
-    if(ataKaka(namn) === "")
-        return false;
-    return true;
+    return !(localStorage.getItem(namn) === undefined || localStorage.getItem(namn) === null);
+        
+}
+
+function debugmeddelande(meddelande) {
+    let objekt = document.createElement("P");
+    let nu = new Date()
+    objekt.innerHTML = nu.toUTCString() + " -- " + meddelande;
+    document.getElementById("debug").appendChild(objekt);
 }

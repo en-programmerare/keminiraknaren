@@ -62,7 +62,7 @@
                 top: 60px;
                 width: 100vw;
                 overflow-y: scroll;
-                height: 80vh;
+                height: calc(100vh - 50px);
             }
             .dold {
                 display: none;
@@ -165,11 +165,13 @@
             <button type="button" onclick="oppna_flik('koncentration')" id="flik_koncentration" class="flik_knapp">Jonkoncentration</button>
             <button type="button" onclick="oppna_flik('ph')" id="flik_ph" class="flik_knapp">pH</button>
             <button type="button" onclick="oppna_flik('ka')" id="flik_ka" class="flik_knapp">Syrakonstanten</button>
-            <button type="button" onclick="oppna_flik('energi')" id="flik_energi" class="flik_knapp">Energi</button>
             <!--<button type="button" onclick="oppna_flik('temperatur')" id="flik_temperatur" class="flik_knapp">Temperatur</button>-->
-            <!--<button type="button" onclick="oppna_flik('volym')" id="flik_volym" class="flik_knapp">Volym</button>-->
+            <button type="button" onclick="oppna_flik('volym')" id="flik_volym" class="flik_knapp">Volym</button>
             <button type="button" onclick="oppna_flik('tryck')" id="flik_tryck" class="flik_knapp">Tryck</button>
-            <!--<button type="button" onclick="oppna_flik('formelsamling')" id="flik_formelsamling" class="flik_knapp">Formelsamling</button>-->
+            <button type="button" onclick="oppna_flik('normalpotential')" id="flik_normalpotential" class="flik_knapp">Normalpotential</button>
+            <button type="button" onclick="oppna_flik('emk')" id="flik_emk" class="flik_knapp">Emk</button>
+            <button type="button" onclick="oppna_flik('energi')" id="flik_energi" class="flik_knapp">Energi</button>
+            <button type="button" onclick="oppna_flik('formelsamling')" id="flik_formelsamling" class="flik_knapp">Formelsamling</button>
             <button type="button" onclick="oppna_flik('installningar')" id="flik_installningar" class="flik_knapp">Inställningar</button>
         </div>
         
@@ -434,8 +436,29 @@
             <output id="ka_ph">0</output> mol/dm<sup>3</sup><br><br>
         </div>
         <div id="temperatur_behallare" class="behallare dold">
+            <details>
+                <summary>Följande räknare kommer snart!</summary>
             Beräkna temperatur med allmänna gaslagen<br><br>
             Beräkna temperaturförändring utifrån energi och specifik värmekapacitet
+            </details>
+        </div>
+        <div id="normalpotential_behallare" class="behallare dold">
+            Beräkna normalpotential utifrån halvcell i normaltillstånd<br>
+            <select id="halvcell_normalpotential" class="halvcellslista" onchange="berakna_normalpotential()">
+            </select><br>
+            <output id="normalpotential">0</output> V
+        </div>
+        <div id="emk_behallare" class="behallare dold">
+            Beräkna emk utifrån halvceller i normaltillstånd<br>
+            <select id="halvcell1_emk" class="halvcellslista" onchange="berakna_emk_halvceller()">
+            </select><br>
+            <select id="halvcell2_emk" class="halvcellslista" onchange="berakna_emk_halvceller()">
+            </select><br>
+            <output id="emk">0</output> V<br><br>
+            Beräkna emk utifrån normalpotentialer<br>
+            <input type="number" placeholder="Normalpotential e⁰ för halvcell 1" id="eo1_emk1" oninput="berakna_emk_normalpotentialer()"> V<br>
+            <input type="number" placeholder="Normalpotential e⁰ för halvcell 2" id="eo2_emk1" oninput="berakna_emk_normalpotentialer()">  V<br>
+            <output id="emk_eo">0</output> V
         </div>
         <div id="energi_behallare" class="behallare dold">
             Beräkna energi utifrån temperaturförändring och specifik värmekapacitet<br>
@@ -577,7 +600,67 @@
             
         </div>
         <div id="volym_behallare" class="behallare dold">
-            Beräkna volym med allmänna gaslagen
+            Beräkna volym med allmänna gaslagen utifrån massa<br>
+            <input type="text" id="amne_volym_gaslag1" placeholder="Ämne..." oninput="berakna_volym_gaslag1()"><br>
+            <input type="number" id="massa_volym_gaslag1" placeholder="Massa..." oninput="berakna_volym_gaslag1()"> 
+            <select id="massval_volym_gaslag1" onchange="berakna_volym_gaslag1()">
+                <option>kg</option>
+                <option>hg</option>
+                <option selected>g</option>
+                <option>mg</option>
+            </select>
+            <br>
+            <input type="number" id="tryck_volym_gaslag1" placeholder="Tryck..." oninput="berakna_volym_gaslag1()">
+            <select id="tryckval_volym_gaslag1" onchange="berakna_volym_gaslag1()">
+                <option selected>kPa</option>
+                <option>hPa</option>
+                <option>Pa</option>
+            </select><br>
+            <input type="number" id="temperatur_volym_gaslag1" placeholder="Temperatur..." oninput="berakna_volym_gaslag1()">
+            <select id="temperaturval_volym_gaslag1" onchange="berakna_volym_gaslag1()">
+                <option>º C</option>
+                <option>K</option>
+            </select><br>
+            <output id="volym_gaslag1">0</output> 
+            <select id="utdataval_volym_gaslag1" onchange="berakna_volym_gaslag1()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br><br>
+            
+            Beräkna volym med allmänna gaslagen utifrån substansmängd<br>
+            <input type="number" id="substansmangd_volym_gaslag2" placeholder="Substansmängd..." oninput="berakna_volym_gaslag2()"> 
+            mol
+            <br>
+            <input type="number" id="tryck_volym_gaslag2" placeholder="Tryck..." oninput="berakna_volym_gaslag2()">
+            <select id="tryckval_volym_gaslag2" onchange="berakna_volym_gaslag2()">
+                <option selected>kPa</option>
+                <option>hPa</option>
+                <option>Pa</option>
+            </select><br>
+            <input type="number" id="temperatur_volym_gaslag2" placeholder="Temperatur..." oninput="berakna_volym_gaslag2()">
+            <select id="temperaturval_volym_gaslag2" onchange="berakna_volym_gaslag2()">
+                <option>º C</option>
+                <option>K</option>
+            </select><br>
+            <output id="volym_gaslag2">0</output> 
+            <select id="utdataval_volym_gaslag2" onchange="berakna_volym_gaslag2()">
+                <option>km³</option>
+                <option>m³</option>
+                <option selected>dm³</option>
+                <option>cm³</option>
+                <option>mm³</option>
+                <option>l</option>
+                <option>dl</option>
+                <option>cl</option>
+                <option>ml</option>
+            </select><br><br>
         </div>
         
         
@@ -595,8 +678,11 @@
             <button type="button" onclick="oppna_flik('koncentration')" class="startval">Jonkoncentration</button>
             <button type="button" onclick="oppna_flik('ph')" class="startval">pH</button><br>
             <button type="button" onclick="oppna_flik('ka')" class="startval">Syrakonstanten</button>
-            <button type="button" onclick="oppna_flik('energi')" class="startval">Energi</button>
+            <button type="button" onclick="oppna_flik('volym')" class="startval">Volym</button>
             <button type="button" onclick="oppna_flik('tryck')" class="startval">Tryck</button><br>
+            <button type="button" onclick="oppna_flik('normalpotential')" class="startval">Normalpotential</button>
+            <button type="button" onclick="oppna_flik('emk')" class="startval">Emk</button>
+            <button type="button" onclick="oppna_flik('energi')" class="startval">Energi</button><br><br>
             
             Observera att flyttalshanteringen kan medföra precisionsfel!<br><br>
             För att skriva i grundpotensform skriver du "E?" i stället för "10<sup>?</sup>".<br>1·10<sup>-14</sup> blir alltså 1E-14
@@ -617,7 +703,7 @@
             <details>
                 <summary >Massa</summary>
                 \(m = n \cdot M\)<br>
-                För gaser gäller att \(m = M \cdot \dfrac{pV}{8,314 \cdot T}\) där \(V\) anges i m<sup>3</sup>.
+                För gaser gäller att \(m = M \cdot \dfrac{pV}{8,314 \cdot T}\) där \(V\) anges i m<sup>3</sup> och \(T\) i K.
             </details>
             <details>
                 <summary>Molmassa</summary>
@@ -627,7 +713,7 @@
                 <summary>Substansmängd</summary>
                 \(n = \dfrac{m}{M}\)<br>
                 \(n = c \cdot V\)<br>
-                För gaser gäller att \(n = \dfrac{pV}{8,314 \cdot T}\) där \(V\) anges i m<sup>3</sup>.
+                För gaser gäller att \(n = \dfrac{pV}{8,314 \cdot T}\) där \(V\) anges i m<sup>3</sup> och \(T\) i K.
             </details>
             <details>
                 <summary>Koncentration och spädning</summary>
@@ -673,12 +759,16 @@
         
         
         <div id="installningar_behallare" class="behallare dold">
-            <label for="standard_kw">Standardvärde för vattnets protolyskonstant K<sub>w</sub>:</label> <input id="standard_kw" type="number" value=1E-14 disabled class="kw" onchange="andraInstallningar()"><br>
-            <label for="decimaler">Antal decimaler vid avrundning:</label> <input id="decimaler" type="number" value=14 disabled onchange="andraInstallningar()"><br>
+            <label for="standard_kw">Standardvärde för vattnets protolyskonstant K<sub>w</sub>:</label> <input id="standard_kw" type="number" value=1E-14><br>
+            <label for="decimaler">Antal decimaler vid avrundning:</label> <input id="decimaler" type="number" value=14><br>
+            <button type="button" onclick="andraInstallningar()">Bekräfta inställningarna</button><br><output id="bekraftat" style="display:none;">Ändringarna bekräftade.</output><br><br>
             <button type=button onclick="tvadelad()" id="tvadelad_knapp">Använd tvådelad skärm</button><br><br>
-            <p class="snedstil" id="kakor">Vissa inställningar kräver kakor (cookies) för att fungera eftersom de annars inte kan sparas mellan sessioner. Ingenting förutom dessa inställningar lagras, och kakorna försvinner efter 30 dagar. Du kan använda alla andra funktioner på Keminiräknaren utan att aktivera kakor.<br><button type="button" onclick="tillatKakor()">Aktivera cookies</button></p>
+            <p class="snedstil" id="kakor">Aktivera lokal lagring för att spara inställningarna mellan besök.<br><button type="button" onclick="tillatKakor()" id="tillat_kakor">Aktivera lokal lagring</button></p>
             
-            <button id="radera_kakor" style="display: none;" onclick="tomKakburken()">Radera kakor</button>
+            <button id="radera_kakor" style="display: none;" onclick="tomKakburken()">Radera lokal lagring</button><br><br>
+            <details id="debug">
+                <summary>Utvecklingsinformation</summary>
+            </details>
         </div>
         
         <button type="button" id="flik_start" style="display:none;" class="flik_knapp">Varför syns den här knappen ???</button>
