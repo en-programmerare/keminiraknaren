@@ -46,8 +46,8 @@ nyhetsladdning.onreadystatechange = function() {
             .innerHTML = nyhetsladdning.responseText;
     }
 };
-nyhetsladdning.open("GET", "https://raw.githubusercontent.com/en-programmerare/persiljahjalp-filer/master/nyheter-keminiraknaren", true);
-nyhetsladdning.send();
+//nyhetsladdning.open("GET", "https://raw.githubusercontent.com/en-programmerare/persiljahjalp-filer/master/nyheter-keminiraknaren", true);
+//nyhetsladdning.send();
 
 kontrolleraKakorVidStart();
 for(let i of document.getElementsByClassName("flik_knapp")) {
